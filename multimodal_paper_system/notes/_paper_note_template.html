@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Paper Note Template</title>
+  <link rel="stylesheet" href="../assets/paper-note.css">
+  <link rel="stylesheet" href="../assets/paper-study-check.css">
+</head>
+<body data-paper-id="paper_template">
+  <div class="page">
+    <header>
+      <p class="eyebrow">多模态论文阅读笔记</p>
+      <h1>论文标题</h1>
+      <p class="subtitle">用“问题 - 方法 - 技术机制 - 关系 - 业务映射”的结构记录阅读笔记。</p>
+      <div class="meta">
+        <span class="pill">方向：待填写</span>
+        <span class="pill">关键词：待填写</span>
+        <span class="pill">年份：待填写</span>
+      </div>
+    </header>
+
+    <main>
+      <nav aria-label="目录">
+        <h2>阅读目录</h2>
+        <a href="#summary">1. 一句话主结论</a>
+        <a href="#problem">2. 问题背景</a>
+        <a href="#method">3. 核心方法</a>
+        <a href="#mechanism">4. 技术机制</a>
+        <a href="#impact">5. 对后续工作的影响</a>
+        <a href="#business">6. 业务映射</a>
+        <a href="#questions">7. 开放问题</a>
+        <a href="#understanding-check">8. 理解检查</a>
+      </nav>
+
+      <div class="note-resizer" aria-hidden="true"></div>
+
+      <div class="content">
+        <section id="summary">
+          <h2>1. 一句话主结论</h2>
+          <p class="lead">在这里写一句最核心的结论。</p>
+        </section>
+
+        <section id="problem">
+          <h2>2. 问题背景</h2>
+          <p>这里说明论文试图解决什么真实问题，为什么原方案不够好。</p>
+        </section>
+
+        <section id="method">
+          <h2>3. 核心方法</h2>
+          <p>这里写核心结构、输入输出和总体流程。</p>
+        </section>
+
+        <section id="mechanism">
+          <h2>4. 技术机制</h2>
+          <p>这里拆开关键模块、loss、训练方式或推理机制。</p>
+        </section>
+
+        <section id="impact">
+          <h2>5. 对后续工作的影响</h2>
+          <p>这里写它和前后论文的关系、启发了什么路线。</p>
+        </section>
+
+        <section id="business">
+          <h2>6. 业务映射</h2>
+          <p>这里写和你自己的业务或项目场景有什么关系。</p>
+        </section>
+
+        <section id="questions">
+          <h2>7. 开放问题</h2>
+          <p>这里记录暂时没理解透、想回头再看的点。</p>
+        </section>
+
+        <section id="understanding-check">
+          <h2>8. 理解检查</h2>
+          <div class="study-check" data-study-check>
+            <div class="study-check-grid">
+              <div class="study-card">
+                <h3>1. 这篇论文在解决什么问题？</h3>
+                <p>写清楚问题背景、原方案的限制和作者的切入点。</p>
+                <textarea data-question-id="problem"></textarea>
+              </div>
+              <div class="study-card">
+                <h3>2. 核心方法或训练机制是什么？</h3>
+                <p>写清楚关键模块、数据流、loss 或训练过程。</p>
+                <textarea data-question-id="method"></textarea>
+              </div>
+              <div class="study-card">
+                <h3>3. 为什么它重要？</h3>
+                <p>写清楚它对后续论文路线、业务应用或你自己的理解有什么意义。</p>
+                <textarea data-question-id="meaning"></textarea>
+              </div>
+            </div>
+            <div class="study-toolbar">
+              <button class="study-button" type="button" data-save-study>保存草稿</button>
+              <button class="study-button primary" type="button" data-submit-study>提交检查</button>
+            </div>
+            <div data-study-result></div>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+  <script src="../assets/paper-note-resize.js"></script>
+  <script src="../assets/paper-study-check.js"></script>
+</body>
+</html>

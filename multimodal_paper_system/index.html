@@ -1,0 +1,1309 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>多模态论文图谱</title>
+  <link rel="stylesheet" href="assets/vis-network.min.css">
+  <style>
+    :root {
+      --bg: #f5f3ea;
+      --panel: rgba(255, 255, 255, 0.9);
+      --ink: #202933;
+      --muted: #6a756f;
+      --line: rgba(83, 96, 86, 0.18);
+      --teal: #18a89b;
+      --blue: #4aa3c7;
+      --amber: #f06b43;
+      --rose: #e73570;
+      --violet: #8c5ab8;
+      --soft: rgba(24, 168, 155, 0.1);
+      --shadow: 0 18px 46px rgba(32, 41, 51, 0.13);
+      --sidebar-width: 380px;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      margin: 0;
+      color: var(--ink);
+      background:
+        linear-gradient(90deg, rgba(255,255,255,0.18) 1px, transparent 1px),
+        linear-gradient(0deg, rgba(255,255,255,0.22) 1px, transparent 1px),
+        radial-gradient(circle at 24% 16%, rgba(24,168,155,0.12), transparent 28%),
+        radial-gradient(circle at 80% 72%, rgba(231,53,112,0.08), transparent 28%),
+        var(--bg);
+      background-size: 34px 34px, 34px 34px, auto, auto, auto;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", sans-serif;
+      line-height: 1.55;
+    }
+
+    a {
+      color: #087c73;
+      text-decoration: none;
+      border-bottom: 1px solid rgba(8, 124, 115, 0.28);
+    }
+
+    .app {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) 12px minmax(300px, var(--sidebar-width));
+    }
+
+    .main {
+      min-width: 0;
+      padding: 24px;
+    }
+
+    .side {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow: auto;
+      border-left: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.92);
+      padding: 24px;
+      backdrop-filter: blur(18px);
+    }
+
+    .resizer {
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      cursor: col-resize;
+      touch-action: none;
+      background:
+        linear-gradient(to right, transparent 0, transparent 5px, rgba(83, 96, 86, 0.12) 5px, rgba(83, 96, 86, 0.12) 7px, transparent 7px, transparent 100%);
+    }
+
+    .resizer:hover,
+    .resizer.dragging {
+      background:
+        linear-gradient(to right, transparent 0, transparent 4px, rgba(15, 118, 110, 0.28) 4px, rgba(15, 118, 110, 0.28) 8px, transparent 8px, transparent 100%);
+    }
+
+    header {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+      align-items: flex-end;
+      margin-bottom: 16px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(28px, 4vw, 46px);
+      line-height: 1.08;
+      letter-spacing: 0;
+    }
+
+    .subtitle {
+      margin: 10px 0 0;
+      max-width: 840px;
+      color: var(--muted);
+      font-size: 16px;
+    }
+
+    .toolbar,
+    .graph-tools {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 14px 0;
+    }
+
+    button {
+      border: 1px solid var(--line);
+      background: rgba(255, 255, 255, 0.78);
+      color: var(--ink);
+      border-radius: 8px;
+      padding: 8px 11px;
+      font: inherit;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(32, 41, 51, 0.04);
+    }
+
+    button.active {
+      color: #fff;
+      background: #0f766e;
+      border-color: #0f766e;
+    }
+
+    .hint {
+      align-self: center;
+      color: var(--muted);
+      font-size: 13px;
+      margin-left: 4px;
+    }
+
+    .stats {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 10px;
+      margin: 14px 0 16px;
+    }
+
+    .stat {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: 0 8px 20px rgba(32, 41, 51, 0.05);
+    }
+
+    .stat strong {
+      display: block;
+      font-size: 24px;
+      line-height: 1;
+    }
+
+    .stat span {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .graph-wrap {
+      position: relative;
+      height: calc(100vh - 250px);
+      min-height: 680px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.5);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    #network {
+      width: 100%;
+      height: 100%;
+      display: block;
+      cursor: grab;
+    }
+
+    #network:active {
+      cursor: grabbing;
+    }
+
+    .legend {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px 14px;
+      color: var(--muted);
+      font-size: 13px;
+      margin: 12px 0 0;
+    }
+
+    .mastery-board {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin: 0 0 18px;
+    }
+
+    .mastery-card {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 14px;
+      box-shadow: 0 8px 20px rgba(32, 41, 51, 0.05);
+    }
+
+    .mastery-head {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: baseline;
+      margin-bottom: 10px;
+    }
+
+    .mastery-head strong {
+      font-size: 15px;
+    }
+
+    .mastery-head span,
+    .mastery-meta {
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .mastery-bar {
+      height: 10px;
+      border-radius: 999px;
+      overflow: hidden;
+      background: rgba(83, 96, 86, 0.12);
+      margin-bottom: 9px;
+    }
+
+    .mastery-fill {
+      height: 100%;
+      border-radius: inherit;
+    }
+
+    .mastery-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px 14px;
+    }
+
+    .dot {
+      display: inline-block;
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      margin-right: 6px;
+      vertical-align: -1px;
+    }
+
+    .side h2 {
+      margin: 0;
+      font-size: 25px;
+      line-height: 1.18;
+    }
+
+    .side .year {
+      color: var(--muted);
+      margin: 4px 0 16px;
+    }
+
+    .tag-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      margin: 12px 0 18px;
+    }
+
+    .tag {
+      display: inline-flex;
+      align-items: center;
+      min-height: 26px;
+      padding: 3px 8px;
+      border-radius: 999px;
+      background: var(--soft);
+      color: #087c73;
+      font-size: 12px;
+      font-weight: 700;
+    }
+
+    .field {
+      border-top: 1px solid var(--line);
+      padding-top: 14px;
+      margin-top: 14px;
+    }
+
+    .field h3 {
+      margin: 0 0 6px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .links {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px;
+      margin-top: 18px;
+    }
+
+    .link-btn {
+      display: block;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      text-align: center;
+      font-weight: 700;
+      border-bottom: 1px solid var(--line);
+      background: #fbfcfa;
+      cursor: pointer;
+    }
+
+    .relation-list {
+      padding-left: 18px;
+      margin: 8px 0 0;
+    }
+
+    .relation-list li {
+      margin: 6px 0;
+    }
+
+    .status {
+      display: inline-block;
+      padding: 4px 8px;
+      border-radius: 999px;
+      background: #eef2ff;
+      color: #3730a3;
+      font-size: 12px;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .done-toggle {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 12px 0 14px;
+      padding: 10px 12px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: rgba(24, 168, 155, 0.08);
+      font-weight: 700;
+    }
+
+    .done-toggle input {
+      width: 18px;
+      height: 18px;
+      accent-color: #0f766e;
+    }
+
+    .done-actions {
+      display: grid;
+      gap: 10px;
+      margin: 12px 0 14px;
+    }
+
+    .study-summary {
+      display: grid;
+      gap: 8px;
+    }
+
+    .study-status-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .study-pill {
+      display: inline-flex;
+      align-items: center;
+      min-height: 28px;
+      padding: 4px 10px;
+      border-radius: 999px;
+      font-size: 12px;
+      font-weight: 800;
+    }
+
+    .study-pill.pass {
+      background: rgba(18, 168, 121, 0.16);
+      color: #0f7f61;
+    }
+
+    .study-pill.fail {
+      background: rgba(180, 83, 9, 0.14);
+      color: #9a4b0b;
+    }
+
+    .study-pill.pending {
+      background: rgba(74, 163, 199, 0.13);
+      color: #0a6f97;
+    }
+
+    .study-helper {
+      color: var(--muted);
+      font-size: 13px;
+      margin: 0;
+    }
+
+    .vis-label.done-badge {
+      position: absolute;
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      background: #12a879;
+      color: white;
+      border: 2px solid white;
+      box-shadow: 0 6px 14px rgba(18, 168, 121, 0.35);
+      font-size: 15px;
+      font-weight: 900;
+      line-height: 18px;
+      text-align: center;
+      pointer-events: none;
+    }
+
+    .empty {
+      color: var(--muted);
+      margin-top: 16px;
+    }
+
+    @media (max-width: 980px) {
+      .app { display: block; }
+      .resizer { display: none; }
+      .side {
+        position: static;
+        height: auto;
+        border-left: 0;
+        border-top: 1px solid var(--line);
+      }
+      .stats { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .mastery-board { grid-template-columns: 1fr; }
+      header { display: block; }
+      .graph-wrap { height: 70vh; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <main class="main">
+      <header>
+        <div>
+          <h1>多模态论文图谱</h1>
+          <p class="subtitle">用 vis-network 物理引擎渲染的本地论文知识图谱：更自由、更有弹性，适合像白板一样拖拽探索。</p>
+        </div>
+      </header>
+
+      <div class="toolbar" id="filters"></div>
+
+      <div class="graph-tools">
+        <button id="restartPhysics" class="active">重启物理</button>
+        <button id="togglePhysics" class="active">暂停动态</button>
+        <button id="fitView">适配视图</button>
+        <button id="showAll" class="active">显示全部</button>
+        <span class="hint">拖动节点会牵动周围关系，双击节点打开笔记。</span>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><strong id="paperCount">0</strong><span>论文节点</span></div>
+        <div class="stat"><strong id="relationCount">0</strong><span>技术关系</span></div>
+        <div class="stat"><strong id="areaCount">0</strong><span>研究方向</span></div>
+        <div class="stat"><strong id="currentPaper">-</strong><span>当前阅读</span></div>
+      </div>
+
+      <section class="mastery-board" id="masteryBoard" aria-label="方向掌握度"></section>
+
+      <div class="graph-wrap">
+        <div id="network" role="img" aria-label="多模态论文图谱"></div>
+      </div>
+
+      <div class="legend" id="legend"></div>
+    </main>
+
+    <div class="resizer" id="sidebarResizer" aria-hidden="true"></div>
+
+    <aside class="side" id="detail">
+      <h2>选择一篇论文</h2>
+      <p class="empty">点击图谱里的节点，查看核心问题、贡献、关键词、PDF 和笔记链接。</p>
+    </aside>
+  </div>
+
+  <script src="assets/vis-network.min.js"></script>
+  <script>
+    const colors = {
+      "VLM Foundations": "#18a89b",
+      "Visual Instruction Tuning": "#4aa3c7",
+      "PEFT": "#f06b43",
+      "Preference Alignment": "#e73570",
+      "Multimodal Alignment": "#8c5ab8"
+    };
+
+    const state = {
+      papers: [],
+      relations: [],
+      progress: null,
+      filter: "All",
+      selected: null,
+      nodes: null,
+      edges: null,
+      network: null,
+      physicsEnabled: true,
+      progressKey: "multimodal_paper_graph_progress",
+      studyPrefix: "paper-study-check:",
+      badges: new Map(),
+      sidebarWidthKey: "multimodal_paper_graph_sidebar_width",
+      resizing: false
+    };
+
+    const noteVersion = "20260529";
+    const customNotes = new Set(["clip_2021"]);
+
+    async function loadJson(path) {
+      const res = await fetch(path);
+      if (!res.ok) throw new Error(`Cannot load ${path}`);
+      return res.json();
+    }
+
+    async function init() {
+      const [papers, relations, progress] = await Promise.all([
+        loadJson("data/papers.json"),
+        loadJson("data/relations.json"),
+        loadJson("data/reading_progress.json")
+      ]);
+      state.papers = papers.sort((a, b) => a.order - b.order);
+      state.relations = relations;
+      state.progress = progress;
+      state.progress.completed = state.progress.completed || [];
+      state.progress.suspended = state.progress.suspended || [];
+      applyStoredProgress();
+      advanceProgress();
+      applyStoredSidebarWidth();
+      state.selected = state.papers.find(p => p.id === state.progress.current) || state.papers[0];
+      renderChrome();
+      bindSidebarResizer();
+      initNetwork();
+      renderDetail(state.selected);
+      window.addEventListener("storage", handleStorageUpdate);
+    }
+
+    function renderChrome() {
+      renderFilters();
+      renderStats();
+      renderLegend();
+      document.getElementById("restartPhysics").onclick = () => {
+        state.network.setOptions({ physics: { enabled: true } });
+        state.network.startSimulation();
+        state.physicsEnabled = true;
+        syncPhysicsButton();
+      };
+      document.getElementById("togglePhysics").onclick = () => {
+        state.physicsEnabled = !state.physicsEnabled;
+        state.network.setOptions({ physics: { enabled: state.physicsEnabled } });
+        if (state.physicsEnabled) state.network.startSimulation();
+        else state.network.stopSimulation();
+        syncPhysicsButton();
+      };
+      document.getElementById("fitView").onclick = () => state.network.fit({ animation: { duration: 520, easingFunction: "easeInOutQuad" } });
+      document.getElementById("showAll").onclick = () => {
+        state.filter = "All";
+        renderFilters();
+        applyFilter();
+      };
+    }
+
+    function bindSidebarResizer() {
+      const handle = document.getElementById("sidebarResizer");
+      if (!handle) return;
+      handle.onpointerdown = event => {
+        if (window.innerWidth <= 980) return;
+        state.resizing = true;
+        handle.classList.add("dragging");
+        handle.setPointerCapture(event.pointerId);
+      };
+      handle.onpointermove = event => {
+        if (!state.resizing) return;
+        const width = Math.min(620, Math.max(300, window.innerWidth - event.clientX));
+        document.documentElement.style.setProperty("--sidebar-width", `${width}px`);
+      };
+      handle.onpointerup = event => {
+        if (!state.resizing) return;
+        state.resizing = false;
+        handle.classList.remove("dragging");
+        handle.releasePointerCapture(event.pointerId);
+        persistSidebarWidth();
+      };
+      handle.onpointercancel = handle.onpointerup;
+    }
+
+    function renderFilters() {
+      const areas = ["All", ...new Set(state.papers.map(p => p.area))];
+      const root = document.getElementById("filters");
+      root.innerHTML = "";
+      areas.forEach(area => {
+        const btn = document.createElement("button");
+        btn.textContent = area === "All" ? "全部" : area;
+        btn.className = state.filter === area ? "active" : "";
+        btn.onclick = () => {
+          state.filter = area;
+          renderFilters();
+          applyFilter();
+        };
+        root.appendChild(btn);
+      });
+    }
+
+    function renderStats() {
+      document.getElementById("paperCount").textContent = state.papers.length;
+      document.getElementById("relationCount").textContent = state.relations.length;
+      document.getElementById("areaCount").textContent = new Set(state.papers.map(p => p.area)).size;
+      const current = state.papers.find(p => p.id === state.progress.current);
+      document.getElementById("currentPaper").textContent = current ? current.title : "-";
+      renderMasteryBoard();
+    }
+
+    function renderMasteryBoard() {
+      const root = document.getElementById("masteryBoard");
+      const areas = [...new Set(state.papers.map(p => p.area))];
+      root.innerHTML = areas.map(area => {
+        const papers = state.papers.filter(p => p.area === area);
+        const studies = papers.map(p => getStudyState(p.id));
+        const doneCount = papers.filter(p => p.status === "done").length;
+        const passCount = studies.filter(Boolean).filter(item => item.pass).length;
+        const answeredCount = studies.filter(Boolean).length;
+        const mastery = computeAreaMastery(papers);
+        return `
+          <article class="mastery-card">
+            <div class="mastery-head">
+              <strong>${area}</strong>
+              <span>${mastery}%</span>
+            </div>
+            <div class="mastery-bar">
+              <div class="mastery-fill" style="width:${mastery}%; background:${colors[area] || "#64748b"};"></div>
+            </div>
+            <div class="mastery-meta">
+              <span>完成 ${doneCount}/${papers.length}</span>
+              <span>通过 ${passCount}/${papers.length}</span>
+              <span>已答题 ${answeredCount}/${papers.length}</span>
+            </div>
+          </article>
+        `;
+      }).join("");
+    }
+
+    function renderLegend() {
+      const root = document.getElementById("legend");
+      root.innerHTML = "";
+      Object.entries(colors).forEach(([area, color]) => {
+        const item = document.createElement("span");
+        item.innerHTML = `<span class="dot" style="background:${color}"></span>${area}`;
+        root.appendChild(item);
+      });
+    }
+
+    function initNetwork() {
+      const degree = degreeMap();
+      state.nodes = new vis.DataSet(state.papers.map(paper => {
+        const size = nodeSize(paper, degree.get(paper.id) || 0);
+        return {
+          id: paper.id,
+          label: paper.title,
+          title: `${paper.title}<br>${paper.coreQuestion}`,
+          area: paper.area,
+          status: paper.status,
+          value: size,
+          size,
+          color: nodeColor(paper),
+          font: baseFont(paper),
+          borderWidth: statusBorderWidth(paper.status),
+          borderDashes: false,
+          shadow: nodeShadow(paper)
+        };
+      }));
+
+      state.edges = new vis.DataSet(state.relations.map((rel, index) => ({
+        id: `edge_${index}`,
+        from: rel.source,
+        to: rel.target,
+        label: "",
+        title: rel.label,
+        type: rel.type,
+        color: edgeColor(rel),
+        width: relationDone(rel) ? 1.8 : 1.15,
+        dashes: relationDone(rel),
+        smooth: { enabled: true, type: "dynamic", roundness: 0.48 }
+      })));
+
+      state.network = new vis.Network(
+        document.getElementById("network"),
+        { nodes: state.nodes, edges: state.edges },
+        networkOptions()
+      );
+
+      state.network.on("click", params => {
+        if (!params.nodes.length) return;
+        const paper = state.papers.find(p => p.id === params.nodes[0]);
+        state.selected = paper;
+        renderDetail(paper);
+        highlightNeighborhood(paper.id);
+      });
+
+      state.network.on("hoverNode", params => highlightNeighborhood(params.node));
+      state.network.on("blurNode", () => state.selected ? highlightNeighborhood(state.selected.id) : resetHighlight());
+      state.network.on("dragStart", () => {
+        state.network.setOptions({ physics: { enabled: true } });
+        state.physicsEnabled = true;
+        syncPhysicsButton();
+      });
+      state.network.on("dragEnd", () => {
+        setTimeout(() => {
+          state.network.stopSimulation();
+          state.physicsEnabled = false;
+          syncPhysicsButton();
+        }, 900);
+      });
+      state.network.on("doubleClick", params => {
+        if (!params.nodes.length) return;
+        const paper = state.papers.find(p => p.id === params.nodes[0]);
+        if (paper) window.open(absoluteHref(noteHref(paper)), "_blank", "noopener");
+      });
+      state.network.once("stabilizationIterationsDone", () => {
+        state.network.fit({ animation: { duration: 560, easingFunction: "easeInOutQuad" } });
+        setTimeout(() => {
+          state.network.stopSimulation();
+          state.physicsEnabled = false;
+          syncPhysicsButton();
+        }, 900);
+      });
+
+      state.network.on("afterDrawing", () => updateDoneBadges());
+      state.network.on("zoom", () => updateDoneBadges());
+      state.network.on("dragging", () => updateDoneBadges());
+      state.network.on("stabilized", () => updateDoneBadges());
+
+      if (state.selected) highlightNeighborhood(state.selected.id);
+      updateDoneBadges();
+    }
+
+    function networkOptions() {
+      return {
+        autoResize: true,
+        interaction: {
+          dragNodes: true,
+          dragView: true,
+          zoomView: true,
+          hover: true,
+          tooltipDelay: 120,
+          hideEdgesOnDrag: false,
+          hideNodesOnDrag: false,
+          navigationButtons: false,
+          keyboard: false
+        },
+        nodes: {
+          shape: "dot",
+          scaling: { min: 18, max: 64 },
+          chosen: {
+            node(values) {
+              values.borderWidth = 5;
+              values.shadowSize = 18;
+            },
+            label(values) {
+              values.size += 2;
+            }
+          }
+        },
+        edges: {
+          selectionWidth: 2.4,
+          hoverWidth: 2,
+          chosen: true
+        },
+        physics: {
+          enabled: true,
+          solver: "forceAtlas2Based",
+          timestep: 0.32,
+          stabilization: {
+            enabled: true,
+            iterations: 180,
+            updateInterval: 20,
+            fit: true
+          },
+          forceAtlas2Based: {
+            gravitationalConstant: -62,
+            centralGravity: 0.012,
+            springLength: 150,
+            springConstant: 0.055,
+            damping: 0.76,
+            avoidOverlap: 0.78
+          },
+          maxVelocity: 22,
+          minVelocity: 0.55
+        }
+      };
+    }
+
+    function applyFilter() {
+      const visibleIds = new Set(
+        state.filter === "All"
+          ? state.papers.map(p => p.id)
+          : state.papers.filter(p => p.area === state.filter).map(p => p.id)
+      );
+      state.nodes.update(state.papers.map(paper => ({ id: paper.id, hidden: !visibleIds.has(paper.id) })));
+      state.edges.update(state.relations.map((rel, index) => ({
+        id: `edge_${index}`,
+        dashes: relationDone(rel),
+        hidden: !visibleIds.has(rel.source) || !visibleIds.has(rel.target)
+      })));
+      document.getElementById("showAll").classList.toggle("active", state.filter === "All");
+      state.network.setOptions({ physics: { enabled: true } });
+      state.network.startSimulation();
+      state.physicsEnabled = true;
+      syncPhysicsButton();
+      setTimeout(() => state.network.fit({ animation: { duration: 480, easingFunction: "easeInOutQuad" } }), 180);
+    }
+
+    function highlightNeighborhood(nodeId) {
+      const neighborIds = new Set([nodeId]);
+      const activeEdgeIds = new Set();
+      state.relations.forEach((rel, index) => {
+        if (rel.source === nodeId || rel.target === nodeId) {
+          neighborIds.add(rel.source);
+          neighborIds.add(rel.target);
+          activeEdgeIds.add(`edge_${index}`);
+        }
+      });
+
+      state.nodes.update(state.papers.map(paper => {
+        const active = neighborIds.has(paper.id);
+        return {
+          id: paper.id,
+          color: active ? nodeColor(paper) : fadedNodeColor(),
+          font: active ? baseFont(paper) : fadedFont(paper),
+          borderWidth: paper.id === nodeId ? 8 : statusBorderWidth(paper.status),
+          borderDashes: false,
+          shadow: nodeShadow(paper)
+        };
+      }));
+
+      state.edges.update(state.relations.map((rel, index) => {
+        const id = `edge_${index}`;
+        const active = activeEdgeIds.has(id);
+        return {
+          id,
+          color: {
+            color: active ? edgeColor(rel).color : "rgba(109,119,113,0.09)",
+            highlight: "#202933",
+            hover: "#202933"
+          },
+          width: active ? (relationDone(rel) ? 1.8 : 1.15) : 0.7,
+          dashes: relationDone(rel)
+        };
+      }));
+      state.network.selectNodes([nodeId]);
+    }
+
+    function resetHighlight() {
+      state.nodes.update(state.papers.map(paper => ({
+        id: paper.id,
+        color: nodeColor(paper),
+        borderWidth: statusBorderWidth(paper.status),
+        borderDashes: false,
+        shadow: nodeShadow(paper),
+        font: baseFont(paper)
+      })));
+      state.edges.update(state.relations.map((rel, index) => ({
+        id: `edge_${index}`,
+        color: edgeColor(rel),
+        width: relationDone(rel) ? 1.8 : 1.15,
+        dashes: relationDone(rel)
+      })));
+    }
+
+    function syncPhysicsButton() {
+      const btn = document.getElementById("togglePhysics");
+      btn.textContent = state.physicsEnabled ? "暂停动态" : "继续动态";
+      btn.classList.toggle("active", state.physicsEnabled);
+    }
+
+    function baseFont(paper) {
+      return {
+        color: "#202933",
+        size: paper.status === "reading" ? 20 : 16,
+        face: "-apple-system, BlinkMacSystemFont, Segoe UI, sans-serif",
+        strokeWidth: 5,
+        strokeColor: "rgba(245,243,234,0.9)"
+      };
+    }
+
+    function fadedFont(paper) {
+      return {
+        ...baseFont(paper),
+        color: "rgba(32,41,51,0.28)"
+      };
+    }
+
+    function nodeShadow(paper) {
+      return {
+        enabled: true,
+        color: paper.status === "done" ? "rgba(18,168,121,0.5)" : "rgba(32,41,51,0.22)",
+        size: paper.status === "done" ? 24 : 12,
+        x: 0,
+        y: 4
+      };
+    }
+
+    function nodeColor(paper) {
+      const color = colors[paper.area] || "#64748b";
+      if (paper.status === "done") {
+        return {
+          background: mixWithWhite(color, 0.22),
+          border: "#12a879",
+          highlight: { background: mixWithWhite(color, 0.14), border: "#0f7f61" },
+          hover: { background: mixWithWhite(color, 0.14), border: "#0f7f61" }
+        };
+      }
+      if (paper.status === "paused") {
+        return {
+          background: mixWithWhite(color, 0.32),
+          border: "#b45309",
+          highlight: { background: mixWithWhite(color, 0.26), border: "#9a4b0b" },
+          hover: { background: mixWithWhite(color, 0.26), border: "#9a4b0b" }
+        };
+      }
+      return {
+        background: color,
+        border: paper.status === "reading" ? "#202933" : "rgba(255,255,255,0.82)",
+        highlight: { background: color, border: "#202933" },
+        hover: { background: color, border: "#202933" }
+      };
+    }
+
+    function edgeColor(rel) {
+      if (relationDone(rel)) {
+        return { color: "rgba(18,168,121,0.72)", highlight: "#0f7f61", hover: "#0f7f61" };
+      }
+      return { color: "rgba(109,119,113,0.35)", highlight: "#202933", hover: "#202933" };
+    }
+
+    function updateDoneBadges() {
+      if (!state.network) return;
+      const container = document.getElementById("network");
+      state.papers.forEach(paper => {
+        let badge = state.badges.get(paper.id);
+        if (paper.status !== "done") {
+          if (badge) {
+            badge.remove();
+            state.badges.delete(paper.id);
+          }
+          return;
+        }
+        if (!badge) {
+          badge = document.createElement("div");
+          badge.className = "vis-label done-badge";
+          badge.textContent = "✓";
+          container.appendChild(badge);
+          state.badges.set(paper.id, badge);
+        }
+        const pos = state.network.getPositions([paper.id])[paper.id];
+        if (!pos) return;
+        const dom = state.network.canvasToDOM(pos);
+        const size = nodeSize(paper, degreeMap().get(paper.id) || 0);
+        badge.style.left = `${dom.x + size * 0.28}px`;
+        badge.style.top = `${dom.y - size * 0.58}px`;
+        badge.style.display = "block";
+      });
+    }
+
+    function mixWithWhite(hex, amount) {
+      const clean = hex.replace("#", "");
+      const value = parseInt(clean, 16);
+      const r = (value >> 16) & 255;
+      const g = (value >> 8) & 255;
+      const b = value & 255;
+      const mix = channel => Math.round(channel + (255 - channel) * amount);
+      return `rgb(${mix(r)}, ${mix(g)}, ${mix(b)})`;
+    }
+
+    function fadedNodeColor() {
+      return {
+        background: "rgba(163,174,168,0.22)",
+        border: "rgba(163,174,168,0.18)",
+        highlight: { background: "rgba(163,174,168,0.22)", border: "rgba(163,174,168,0.18)" },
+        hover: { background: "rgba(163,174,168,0.22)", border: "rgba(163,174,168,0.18)" }
+      };
+    }
+
+    function degreeMap() {
+      const map = new Map(state.papers.map(p => [p.id, 0]));
+      state.relations.forEach(rel => {
+        map.set(rel.source, (map.get(rel.source) || 0) + 1);
+        map.set(rel.target, (map.get(rel.target) || 0) + 1);
+      });
+      return map;
+    }
+
+    function nodeSize(paper, degree) {
+      let size = 20 + degree * 5;
+      if (paper.status === "reading") size += 16;
+      if (["clip_2021", "llava_2023", "lora_2021", "instructgpt_2022"].includes(paper.id)) size += 9;
+      return Math.max(20, Math.min(64, size));
+    }
+
+    function renderDetail(paper) {
+      const root = document.getElementById("detail");
+      if (!paper) {
+        root.innerHTML = `<h2>没有节点</h2><p class="empty">当前筛选条件下没有论文。</p>`;
+        return;
+      }
+      const incoming = state.relations.filter(r => r.target === paper.id);
+      const outgoing = state.relations.filter(r => r.source === paper.id);
+      const study = getStudyState(paper.id);
+      const suspended = (state.progress.suspended || []).includes(paper.id);
+      root.innerHTML = `
+        <h2>${paper.title}</h2>
+        <p class="year">${paper.year} · ${paper.area} · <span class="status">${paper.status}</span></p>
+        <div class="done-actions">
+          <label class="done-toggle">
+            <input type="checkbox" id="doneToggle" ${paper.status === "done" ? "checked" : ""}>
+            <span>完成阅读</span>
+          </label>
+          <label class="done-toggle">
+            <input type="checkbox" id="suspendToggle" ${suspended ? "checked" : ""}>
+            <span>暂时挂起</span>
+          </label>
+        </div>
+        <div class="field study-summary">
+          <h3>理解检查</h3>
+          ${studySummaryMarkup(study, suspended)}
+        </div>
+        <div class="tag-list">${paper.keywords.map(k => `<span class="tag">${k}</span>`).join("")}</div>
+        <div class="field">
+          <h3>核心问题</h3>
+          <p>${paper.coreQuestion}</p>
+        </div>
+        <div class="field">
+          <h3>核心贡献</h3>
+          <p>${paper.contribution}</p>
+        </div>
+        <div class="field">
+          <h3>输入关系</h3>
+          ${relationList(incoming, "source")}
+        </div>
+        <div class="field">
+          <h3>输出关系</h3>
+          ${relationList(outgoing, "target")}
+        </div>
+        <div class="links">
+          <button class="link-btn" id="openPdfBtn" type="button">打开 PDF</button>
+          <button class="link-btn" id="openNoteBtn" type="button">打开笔记</button>
+        </div>
+      `;
+      document.getElementById("doneToggle").onchange = event => setPaperDone(paper.id, event.target.checked);
+      document.getElementById("suspendToggle").onchange = event => setPaperSuspended(paper.id, event.target.checked);
+      document.getElementById("openPdfBtn").onclick = () => {
+        window.open(absoluteHref(servedPdfHref(paper.pdf)), "_blank", "noopener");
+      };
+      document.getElementById("openNoteBtn").onclick = () => {
+        window.open(absoluteHref(noteHref(paper)), "_blank", "noopener");
+      };
+    }
+
+    function relationList(relations, side) {
+      if (!relations.length) return `<p class="empty">暂无关系。</p>`;
+      return `<ul class="relation-list">` + relations.map(rel => {
+        const other = state.papers.find(p => p.id === rel[side]);
+        const name = other ? other.title : rel[side];
+        return `<li><strong>${name}</strong>：${rel.label} <span class="tag">${rel.type}</span></li>`;
+      }).join("") + `</ul>`;
+    }
+
+    function servedPdfHref(pdfPath) {
+      const prefix = "/Users/applemima1111/Documents/Codex/2026-05-11/prd/papers/";
+      if (pdfPath.startsWith(prefix)) {
+        return "papers-src/" + pdfPath.slice(prefix.length).split("/").map(encodeURIComponent).join("/");
+      }
+      return pdfPath;
+    }
+
+    function noteHref(paper) {
+      const notePath = customNotes.has(paper.id)
+        ? paper.note
+        : `notes/paper_note_runtime.html?paperId=${encodeURIComponent(paper.id)}`;
+      const normalized = `${notePath}${notePath.includes("?") ? "&" : "?"}v=${noteVersion}`;
+      if (window.location.protocol === "http:" || window.location.protocol === "https:") {
+        const url = new URL(notePath, window.location.href);
+        url.searchParams.set("v", noteVersion);
+        return `${url.pathname}${url.search}`;
+      }
+      return normalized;
+    }
+
+    function absoluteHref(path) {
+      return new URL(path, window.location.href).toString();
+    }
+
+    function setPaperDone(id, done) {
+      const paper = state.papers.find(p => p.id === id);
+      if (!paper) return;
+      const completed = new Set(state.progress.completed || []);
+      const suspended = new Set(state.progress.suspended || []);
+      if (done) {
+        const study = getStudyState(id);
+        if (!study?.pass) {
+          alert("这篇论文还没有通过理解检查。先打开笔记，完成问题填写并提交检查；如果只是暂时放下，可以先勾选“暂时挂起”。");
+          renderDetail(paper);
+          return;
+        }
+        completed.add(id);
+        suspended.delete(id);
+      } else {
+        completed.delete(id);
+      }
+      state.progress.completed = sortPaperIds([...completed]);
+      state.progress.suspended = sortPaperIds([...suspended]);
+      advanceProgress();
+      persistProgress();
+      refreshGraphStyles();
+      renderStats();
+      renderDetail(paper);
+      highlightNeighborhood(id);
+    }
+
+    function setPaperSuspended(id, suspended) {
+      const paper = state.papers.find(p => p.id === id);
+      if (!paper) return;
+      const suspendedSet = new Set(state.progress.suspended || []);
+      const completed = new Set(state.progress.completed || []);
+      if (suspended) {
+        suspendedSet.add(id);
+        completed.delete(id);
+      } else {
+        suspendedSet.delete(id);
+      }
+      state.progress.suspended = sortPaperIds([...suspendedSet]);
+      state.progress.completed = sortPaperIds([...completed]);
+      advanceProgress();
+      persistProgress();
+      refreshGraphStyles();
+      renderStats();
+      renderDetail(paper);
+      highlightNeighborhood(id);
+    }
+
+    function advanceProgress() {
+      const order = state.progress.weeklyOrder || state.papers.map(p => p.id);
+      const completed = new Set(state.progress.completed || []);
+      const suspended = new Set(state.progress.suspended || []);
+      const remaining = order.filter(id => !completed.has(id) && !suspended.has(id));
+      state.progress.current = remaining[0] || null;
+      state.progress.next = remaining[1] || null;
+      state.progress.updatedAt = new Date().toISOString().slice(0, 10);
+
+      state.papers.forEach(p => {
+        if (completed.has(p.id)) p.status = "done";
+        else if (suspended.has(p.id)) p.status = "paused";
+        else if (p.id === state.progress.current) p.status = "reading";
+        else p.status = "todo";
+      });
+    }
+
+    function persistProgress() {
+      localStorage.setItem(state.progressKey, JSON.stringify({
+        completed: state.progress.completed || [],
+        suspended: state.progress.suspended || [],
+        current: state.progress.current,
+        next: state.progress.next,
+        updatedAt: state.progress.updatedAt
+      }));
+    }
+
+    function applyStoredProgress() {
+      try {
+        const raw = localStorage.getItem(state.progressKey);
+        if (!raw) return;
+        const stored = JSON.parse(raw);
+        if (Array.isArray(stored.completed)) state.progress.completed = stored.completed;
+        if (Array.isArray(stored.suspended)) state.progress.suspended = stored.suspended;
+        if ("current" in stored) state.progress.current = stored.current;
+        if ("next" in stored) state.progress.next = stored.next;
+        if (stored.updatedAt) state.progress.updatedAt = stored.updatedAt;
+      } catch {
+        localStorage.removeItem(state.progressKey);
+      }
+    }
+
+    function applyStoredSidebarWidth() {
+      try {
+        const raw = localStorage.getItem(state.sidebarWidthKey);
+        const width = Number(raw);
+        if (!Number.isNaN(width) && width >= 300 && width <= 620) {
+          document.documentElement.style.setProperty("--sidebar-width", `${width}px`);
+        }
+      } catch {}
+    }
+
+    function persistSidebarWidth() {
+      const width = getComputedStyle(document.documentElement).getPropertyValue("--sidebar-width").trim();
+      localStorage.setItem(state.sidebarWidthKey, width.replace("px", ""));
+    }
+
+    function refreshGraphStyles() {
+      const degree = degreeMap();
+      state.nodes.update(state.papers.map(paper => ({
+        id: paper.id,
+        status: paper.status,
+        value: nodeSize(paper, degree.get(paper.id) || 0),
+        size: nodeSize(paper, degree.get(paper.id) || 0),
+        color: nodeColor(paper),
+        borderWidth: statusBorderWidth(paper.status),
+        borderDashes: false,
+        shadow: nodeShadow(paper),
+        font: baseFont(paper)
+      })));
+      state.edges.update(state.relations.map((rel, index) => ({
+        id: `edge_${index}`,
+        dashes: relationDone(rel),
+        width: relationDone(rel) ? 1.8 : 1.15,
+        color: edgeColor(rel)
+      })));
+      updateDoneBadges();
+    }
+
+    function relationDone(rel) {
+      const source = state.papers.find(p => p.id === rel.source);
+      const target = state.papers.find(p => p.id === rel.target);
+      return source?.status === "done" && target?.status === "done";
+    }
+
+    function statusBorderWidth(status) {
+      if (status === "done") return 8;
+      if (status === "reading" || status === "paused") return 4;
+      return 2;
+    }
+
+    function getStudyState(paperId) {
+      try {
+        const raw = localStorage.getItem(`${state.studyPrefix}${paperId}`);
+        if (!raw) return null;
+        return JSON.parse(raw);
+      } catch {
+        return null;
+      }
+    }
+
+    function computeAreaMastery(papers) {
+      if (!papers.length) return 0;
+      const total = papers.reduce((sum, paper) => {
+        const study = getStudyState(paper.id);
+        if (!study) return sum;
+        if (study.pass) return sum + Math.max(70, Math.min(100, study.score || 0));
+        return sum + Math.round((study.score || 0) * 0.45);
+      }, 0);
+      return Math.round(total / papers.length);
+    }
+
+    function studySummaryMarkup(study, suspended) {
+      if (suspended) {
+        return `
+          <div class="study-status-row">
+            <span class="study-pill fail">暂时挂起</span>
+          </div>
+          <p class="study-helper">这篇论文目前不会算作理解完成，也不会继续卡住下一个 paper。</p>
+        `;
+      }
+      if (!study || !study.updatedAt) {
+        return `
+          <div class="study-status-row">
+            <span class="study-pill pending">未提交</span>
+          </div>
+          <p class="study-helper">先打开笔记，做初始化阅读和问题留存，读完后再提交理解检查。</p>
+        `;
+      }
+      return `
+        <div class="study-status-row">
+          <span class="study-pill ${study.pass ? "pass" : "fail"}">${study.pass ? "通过" : "未通过"}</span>
+          <span class="study-pill pending">${study.score || 0} / 100</span>
+        </div>
+        <p class="study-helper">最近检查：${study.updatedAt.slice(0, 10)}。只有通过理解检查后，才能勾选完成阅读。</p>
+      `;
+    }
+
+    function sortPaperIds(ids) {
+      return ids.sort((a, b) => {
+        const pa = state.papers.find(p => p.id === a)?.order || 0;
+        const pb = state.papers.find(p => p.id === b)?.order || 0;
+        return pa - pb;
+      });
+    }
+
+    function handleStorageUpdate(event) {
+      if (!event.key || !event.key.startsWith(state.studyPrefix)) return;
+      renderStats();
+      if (state.selected) renderDetail(state.selected);
+    }
+
+    init().catch(error => {
+      document.querySelector(".main").innerHTML = `
+        <h1>图谱加载失败</h1>
+        <p>请在 <code>multimodal_paper_system</code> 目录启动本地服务后访问页面：</p>
+        <pre>python3 -m http.server 8123</pre>
+        <p>${error.message}</p>
+      `;
+    });
+  </script>
+</body>
+</html>

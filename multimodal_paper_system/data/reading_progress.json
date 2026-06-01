@@ -1,0 +1,24 @@
+{
+  "current": "clip_2021",
+  "next": "flamingo_2022",
+  "completed": [],
+  "weeklyOrder": [
+    "clip_2021",
+    "flamingo_2022",
+    "blip2_2023",
+    "llava_2023",
+    "llava15_2023",
+    "adapters_2019",
+    "prefix_tuning_2021",
+    "ptuningv2_2021",
+    "lora_2021",
+    "qlora_2023",
+    "self_instruct_2022",
+    "instructgpt_2022",
+    "dpo_2023",
+    "constitutional_ai_2022",
+    "imagebind_2023"
+  ],
+  "updatedAt": "2026-05-28",
+  "reminder": "Every Friday at 09:00, choose the next paper based on this progress file."
+}

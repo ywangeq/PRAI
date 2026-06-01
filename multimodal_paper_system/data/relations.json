@@ -1,0 +1,104 @@
+[
+  {
+    "source": "clip_2021",
+    "target": "flamingo_2022",
+    "type": "foundation",
+    "label": "image-text alignment enables VLM scaling"
+  },
+  {
+    "source": "clip_2021",
+    "target": "blip2_2023",
+    "type": "foundation",
+    "label": "vision-language representation foundation"
+  },
+  {
+    "source": "flamingo_2022",
+    "target": "blip2_2023",
+    "type": "architecture_contrast",
+    "label": "different ways to connect vision and language models"
+  },
+  {
+    "source": "blip2_2023",
+    "target": "llava_2023",
+    "type": "enables",
+    "label": "bridging vision features into LLMs"
+  },
+  {
+    "source": "llava_2023",
+    "target": "llava15_2023",
+    "type": "improves",
+    "label": "stronger visual instruction tuning baseline"
+  },
+  {
+    "source": "adapters_2019",
+    "target": "prefix_tuning_2021",
+    "type": "peft_evolution",
+    "label": "from inserted modules to prompt parameters"
+  },
+  {
+    "source": "prefix_tuning_2021",
+    "target": "ptuningv2_2021",
+    "type": "improves",
+    "label": "deeper prompt tuning"
+  },
+  {
+    "source": "ptuningv2_2021",
+    "target": "lora_2021",
+    "type": "peft_evolution",
+    "label": "mainstream trainable parameter injection"
+  },
+  {
+    "source": "lora_2021",
+    "target": "qlora_2023",
+    "type": "improves",
+    "label": "quantized base model plus LoRA adapters"
+  },
+  {
+    "source": "llava_2023",
+    "target": "lora_2021",
+    "type": "implementation_support",
+    "label": "visual instruction tuning can use PEFT"
+  },
+  {
+    "source": "llava15_2023",
+    "target": "qlora_2023",
+    "type": "implementation_support",
+    "label": "practical low-memory VLM adaptation"
+  },
+  {
+    "source": "self_instruct_2022",
+    "target": "instructgpt_2022",
+    "type": "alignment_pipeline",
+    "label": "instruction data before preference alignment"
+  },
+  {
+    "source": "instructgpt_2022",
+    "target": "dpo_2023",
+    "type": "alternative",
+    "label": "DPO simplifies preference optimization"
+  },
+  {
+    "source": "instructgpt_2022",
+    "target": "constitutional_ai_2022",
+    "type": "alignment_pipeline",
+    "label": "human feedback vs principle-guided AI feedback"
+  },
+  {
+    "source": "clip_2021",
+    "target": "imagebind_2023",
+    "type": "extends",
+    "label": "from image-text to broader multimodal alignment"
+  },
+  {
+    "source": "llava_2023",
+    "target": "instructgpt_2022",
+    "type": "method_transfer",
+    "label": "instruction following transferred into visual domain"
+  },
+  {
+    "source": "llava15_2023",
+    "target": "dpo_2023",
+    "type": "future_extension",
+    "label": "visual preference tuning direction"
+  }
+]

@@ -1,0 +1,6 @@
+.DS_Store
+CLIP_阅读笔记.html
+
+multimodal_paper_system/papers-src
+multimodal_paper_system/backend/__pycache__/
+multimodal_paper_system/backend/*.local.json

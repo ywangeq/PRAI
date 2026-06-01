@@ -1,0 +1,57 @@
+[
+  {
+    "type": "foundation",
+    "label": "方法基础",
+    "description": "A paper provides a conceptual or representation foundation for another paper."
+  },
+  {
+    "type": "extends",
+    "label": "能力扩展",
+    "description": "A later paper expands the modality, task scope, or capability range."
+  },
+  {
+    "type": "improves",
+    "label": "改进版本",
+    "description": "A paper improves a prior baseline, recipe, or method family."
+  },
+  {
+    "type": "enables",
+    "label": "支撑后续方法",
+    "description": "A method makes another architecture or workflow practical."
+  },
+  {
+    "type": "alternative",
+    "label": "替代路线",
+    "description": "Two papers address a related goal with different training or optimization choices."
+  },
+  {
+    "type": "peft_evolution",
+    "label": "PEFT 演化",
+    "description": "A relation inside the parameter-efficient fine-tuning method line."
+  },
+  {
+    "type": "alignment_pipeline",
+    "label": "对齐流程",
+    "description": "A relation inside instruction, preference, or safety alignment workflows."
+  },
+  {
+    "type": "implementation_support",
+    "label": "工程支撑",
+    "description": "A method can support practical training or deployment of another model family."
+  },
+  {
+    "type": "method_transfer",
+    "label": "方法迁移",
+    "description": "A method pattern from one model family transfers to another domain."
+  },
+  {
+    "type": "future_extension",
+    "label": "后续延展",
+    "description": "A plausible future connection for reading, experiments, or business use."
+  },
+  {
+    "type": "architecture_contrast",
+    "label": "架构对照",
+    "description": "Two papers solve similar architecture problems with meaningfully different designs."
+  }
+]

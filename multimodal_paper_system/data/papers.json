@@ -1,0 +1,293 @@
+[
+  {
+    "id": "clip_2021",
+    "title": "CLIP",
+    "fullTitle": "Learning Transferable Visual Models From Natural Language Supervision",
+    "year": 2021,
+    "area": "VLM Foundations",
+    "folder": "01_vlm_foundations",
+    "keywords": [
+      "image-text contrastive learning",
+      "zero-shot",
+      "natural language supervision",
+      "shared embedding space"
+    ],
+    "coreQuestion": "How can natural language supervision train transferable visual representations?",
+    "contribution": "Trains image and text encoders jointly so images and prompts can be compared in one embedding space.",
+    "pdf": "/Users/applemima1111/Documents/Codex/2026-05-11/prd/papers/01_vlm_foundations/2021_CLIP_Learning_Transferable_Visual_Models.pdf",
+    "note": "notes/clip_2021.html",
+    "status": "reading",
+    "order": 1
+  },
+  {
+    "id": "flamingo_2022",
+    "title": "Flamingo",
+    "fullTitle": "Few-Shot Learning With Multimodal Language Models",
+    "year": 2022,
+    "area": "VLM Foundations",
+    "folder": "01_vlm_foundations",
+    "keywords": [
+      "few-shot VLM",
+      "interleaved image-text",
+      "visual language modeling"
+    ],
+    "coreQuestion": "How can a model perform few-shot visual-language tasks with interleaved image and text inputs?",
+    "contribution": "Connects vision features to a language model for multimodal in-context learning.",
+    "pdf": "/Users/applemima1111/Documents/Codex/2026-05-11/prd/papers/01_vlm_foundations/2022_Flamingo_Few_Shot_Visual_Language_Model.pdf",
+    "note": "notes/flamingo_2022.html",
+    "status": "todo",
+    "order": 2
+  },
+  {
+    "id": "blip2_2023",
+    "title": "BLIP-2",
+    "fullTitle": "Bootstrapping Language-Image Pre-training With Frozen Image Encoders and Large Language Models",
+    "year": 2023,
+    "area": "VLM Foundations",
+    "folder": "01_vlm_foundations",
+    "keywords": [
+      "frozen vision encoder",
+      "frozen LLM",
+      "Q-Former",
+      "efficient VLM pretraining"
+    ],
+    "coreQuestion": "How can frozen vision encoders and frozen LLMs be connected efficiently?",
+    "contribution": "Introduces a lightweight bridge module between vision encoders and LLMs.",
+    "pdf": "/Users/applemima1111/Documents/Codex/2026-05-11/prd/papers/01_vlm_foundations/2023_BLIP2_Bootstrapping_Language_Image_Pretraining.pdf",
+    "note": "notes/blip2_2023.html",
+    "status": "todo",
+    "order": 3
+  },
+  {
+    "id": "llava_2023",
+    "title": "LLaVA",
+    "fullTitle": "Visual Instruction Tuning",
+    "year": 2023,
+    "area": "Visual Instruction Tuning",
+    "folder": "02_visual_instruction_tuning",
+    "keywords": [
+      "visual instruction tuning",
+      "image instruction data",
+      "multimodal chat"
+    ],
+    "coreQuestion": "How can visual-language models learn to follow image-grounded instructions?",
+    "contribution": "Builds visual instruction data and aligns a vision encoder with an LLM for image chat.",
+    "pdf": "/Users/applemima1111/Documents/Codex/2026-05-11/prd/papers/02_visual_instruction_tuning/2023_LLaVA_Visual_Instruction_Tuning.pdf",
+    "note": "notes/llava_2023.html",
+    "status": "todo",
+    "order": 4
+  },
+  {
+    "id": "llava15_2023",
+    "title": "LLaVA 1.5",
+    "fullTitle": "Improved Baselines With Visual Instruction Tuning",
+    "year": 2023,
+    "area": "Visual Instruction Tuning",
+    "folder": "02_visual_instruction_tuning",
+    "keywords": [
+      "improved VLM baseline",
+      "visual instruction tuning recipe",
+      "open VLM"
+    ],
+    "coreQuestion": "What practical recipe makes visual instruction tuning stronger and reproducible?",
+    "contribution": "Improves LLaVA's training recipe and establishes a stronger open VLM baseline.",
+    "pdf": "/Users/applemima1111/Documents/Codex/2026-05-11/prd/papers/02_visual_instruction_tuning/2023_LLaVA_15_Improved_Baselines_Visual_Instruction_Tuning.pdf",
+    "note": "notes/llava15_2023.html",
+    "status": "todo",
+    "order": 5
+  },
+  {
+    "id": "adapters_2019",
+    "title": "Adapters",
+    "fullTitle": "Parameter-Efficient Transfer Learning for NLP",
+    "year": 2019,
+    "area": "PEFT",
+    "folder": "03_peft_finetuning",
+    "keywords": [
+      "adapter modules",
+      "parameter-efficient transfer",
+      "modular adaptation"
+    ],
+    "coreQuestion": "How can models adapt to new tasks without updating all parameters?",
+    "contribution": "Adds small trainable adapter modules while keeping the base model mostly fixed.",
+    "pdf": "/Users/applemima1111/Documents/Codex/2026-05-11/prd/papers/03_peft_finetuning/2019_Adapters_Parameter_Efficient_Transfer_Learning.pdf",
+    "note": "notes/adapters_2019.html",
+    "status": "todo",
+    "order": 6
+  },
+  {
+    "id": "prefix_tuning_2021",
+    "title": "Prefix Tuning",
+    "fullTitle": "Prefix-Tuning: Optimizing Continuous Prompts for Generation",
+    "year": 2021,
+    "area": "PEFT",
+    "folder": "03_peft_finetuning",
+    "keywords": [
+      "continuous prompts",
+      "generation adaptation",
+      "frozen language model"
+    ],
+    "coreQuestion": "Can trainable prefixes steer a frozen language model?",
+    "contribution": "Learns continuous prefix vectors for generation tasks without full fine-tuning.",
+    "pdf": "/Users/applemima1111/Documents/Codex/2026-05-11/prd/papers/03_peft_finetuning/2021_Prefix_Tuning.pdf",
+    "note": "notes/prefix_tuning_2021.html",
+    "status": "todo",
+    "order": 7
+  },
+  {
+    "id": "ptuningv2_2021",
+    "title": "P-Tuning v2",
+    "fullTitle": "P-Tuning v2",
+    "year": 2021,
+    "area": "PEFT",
+    "folder": "03_peft_finetuning",
+    "keywords": [
+      "deep prompt tuning",
+      "prompt-based PEFT",
+      "scale robustness"
+    ],
+    "coreQuestion": "How can prompt tuning work robustly across model sizes and tasks?",
+    "contribution": "Uses deep prompt tuning to improve prompt-based PEFT performance.",
+    "pdf": "/Users/applemima1111/Documents/Codex/2026-05-11/prd/papers/03_peft_finetuning/2021_P_Tuning_v2.pdf",
+    "note": "notes/ptuningv2_2021.html",
+    "status": "todo",
+    "order": 8
+  },
+  {
+    "id": "lora_2021",
+    "title": "LoRA",
+    "fullTitle": "Low-Rank Adaptation of Large Language Models",
+    "year": 2021,
+    "area": "PEFT",
+    "folder": "03_peft_finetuning",
+    "keywords": [
+      "low-rank adaptation",
+      "trainable rank decomposition",
+      "efficient fine-tuning"
+    ],
+    "coreQuestion": "Can low-rank updates approximate full fine-tuning for large models?",
+    "contribution": "Injects trainable low-rank matrices into Transformer layers.",
+    "pdf": "/Users/applemima1111/Documents/Codex/2026-05-11/prd/papers/03_peft_finetuning/2021_LoRA_Low_Rank_Adaptation.pdf",
+    "note": "notes/lora_2021.html",
+    "status": "todo",
+    "order": 9
+  },
+  {
+    "id": "qlora_2023",
+    "title": "QLoRA",
+    "fullTitle": "Efficient Finetuning of Quantized LLMs",
+    "year": 2023,
+    "area": "PEFT",
+    "folder": "03_peft_finetuning",
+    "keywords": [
+      "4-bit quantization",
+      "LoRA",
+      "memory-efficient fine-tuning"
+    ],
+    "coreQuestion": "How can larger models be fine-tuned on limited GPU memory?",
+    "contribution": "Combines quantized base models with LoRA adapters for memory-efficient training.",
+    "pdf": "/Users/applemima1111/Documents/Codex/2026-05-11/prd/papers/03_peft_finetuning/2023_QLoRA_Efficient_Finetuning_Quantized_LLMs.pdf",
+    "note": "notes/qlora_2023.html",
+    "status": "todo",
+    "order": 10
+  },
+  {
+    "id": "self_instruct_2022",
+    "title": "Self-Instruct",
+    "fullTitle": "Self-Instruct",
+    "year": 2022,
+    "area": "Preference Alignment",
+    "folder": "04_preference_alignment",
+    "keywords": [
+      "synthetic instruction data",
+      "instruction bootstrapping",
+      "SFT data"
+    ],
+    "coreQuestion": "How can instruction data be bootstrapped when human labels are scarce?",
+    "contribution": "Generates synthetic instructions to expand instruction-following data.",
+    "pdf": "/Users/applemima1111/Documents/Codex/2026-05-11/prd/papers/04_preference_alignment/2022_Self_Instruct.pdf",
+    "note": "notes/self_instruct_2022.html",
+    "status": "todo",
+    "order": 11
+  },
+  {
+    "id": "instructgpt_2022",
+    "title": "InstructGPT",
+    "fullTitle": "Training Language Models to Follow Instructions With Human Feedback",
+    "year": 2022,
+    "area": "Preference Alignment",
+    "folder": "04_preference_alignment",
+    "keywords": [
+      "SFT",
+      "reward model",
+      "RLHF",
+      "instruction following"
+    ],
+    "coreQuestion": "How can human feedback align model behavior with user instructions?",
+    "contribution": "Uses SFT, reward modeling, and RLHF to improve instruction following.",
+    "pdf": "/Users/applemima1111/Documents/Codex/2026-05-11/prd/papers/04_preference_alignment/2022_InstructGPT_RLHF.pdf",
+    "note": "notes/instructgpt_2022.html",
+    "status": "todo",
+    "order": 12
+  },
+  {
+    "id": "dpo_2023",
+    "title": "DPO",
+    "fullTitle": "Direct Preference Optimization",
+    "year": 2023,
+    "area": "Preference Alignment",
+    "folder": "04_preference_alignment",
+    "keywords": [
+      "preference optimization",
+      "RLHF alternative",
+      "policy optimization"
+    ],
+    "coreQuestion": "Can preference alignment be done without explicit reward model training?",
+    "contribution": "Optimizes directly on preference pairs using a simpler objective than RLHF pipelines.",
+    "pdf": "/Users/applemima1111/Documents/Codex/2026-05-11/prd/papers/04_preference_alignment/2023_DPO_Direct_Preference_Optimization.pdf",
+    "note": "notes/dpo_2023.html",
+    "status": "todo",
+    "order": 13
+  },
+  {
+    "id": "constitutional_ai_2022",
+    "title": "Constitutional AI",
+    "fullTitle": "Constitutional AI: Harmlessness From AI Feedback",
+    "year": 2022,
+    "area": "Preference Alignment",
+    "folder": "04_preference_alignment",
+    "keywords": [
+      "RLAIF",
+      "principle-guided alignment",
+      "safety behavior"
+    ],
+    "coreQuestion": "Can AI feedback guided by principles improve harmlessness and safety behavior?",
+    "contribution": "Uses constitutional principles and AI feedback for safer model behavior.",
+    "pdf": "/Users/applemima1111/Documents/Codex/2026-05-11/prd/papers/04_preference_alignment/2022_Constitutional_AI_RLAIF.pdf",
+    "note": "notes/constitutional_ai_2022.html",
+    "status": "todo",
+    "order": 14
+  },
+  {
+    "id": "imagebind_2023",
+    "title": "ImageBind",
+    "fullTitle": "One Embedding Space To Bind Them All",
+    "year": 2023,
+    "area": "Multimodal Alignment",
+    "folder": "05_multimodal_alignment",
+    "keywords": [
+      "multimodal alignment",
+      "audio",
+      "depth",
+      "thermal",
+      "IMU",
+      "shared embedding space"
+    ],
+    "coreQuestion": "Can many modalities be aligned into one shared embedding space?",
+    "contribution": "Extends alignment beyond image-text to audio, depth, thermal, and sensor modalities.",
+    "pdf": "/Users/applemima1111/Documents/Codex/2026-05-11/prd/papers/05_multimodal_alignment/2023_ImageBind_One_Embedding_Space.pdf",
+    "note": "notes/imagebind_2023.html",
+    "status": "todo",
+    "order": 15
+  }
+]

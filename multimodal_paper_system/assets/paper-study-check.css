@@ -1,0 +1,152 @@
+.study-check {
+  margin-top: 18px;
+}
+
+.study-check-grid {
+  display: grid;
+  gap: 14px;
+}
+
+.study-card {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfa;
+  padding: 16px;
+}
+
+.study-card h3 {
+  margin: 0 0 8px;
+}
+
+.study-card p {
+  margin: 0 0 10px;
+  color: var(--muted);
+  font-size: 14px;
+}
+
+.study-card textarea {
+  width: 100%;
+  min-height: 120px;
+  resize: vertical;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 12px;
+  font: inherit;
+  line-height: 1.6;
+  color: var(--ink);
+  background: #fff;
+}
+
+.study-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 16px;
+}
+
+.study-button {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--paper);
+  color: var(--ink);
+  padding: 10px 14px;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.study-button.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #fff;
+}
+
+.study-status {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.study-pill {
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.study-pill.pass {
+  background: rgba(18, 168, 121, 0.16);
+  color: #0f7f61;
+}
+
+.study-pill.fail {
+  background: rgba(180, 83, 9, 0.14);
+  color: #9a4b0b;
+}
+
+.study-note {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.study-diagnostics {
+  display: grid;
+  gap: 12px;
+  margin-top: 14px;
+}
+
+.study-panel,
+.study-breakdown {
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fbfcfa;
+  padding: 14px 16px;
+}
+
+.study-panel h4,
+.study-breakdown-head strong {
+  margin: 0;
+  font-size: 15px;
+}
+
+.study-panel ul,
+.study-breakdown-list {
+  margin: 8px 0 0;
+  padding-left: 18px;
+}
+
+.study-panel li,
+.study-breakdown-list li {
+  margin: 6px 0;
+}
+
+.study-breakdown.pass {
+  border-color: rgba(18, 168, 121, 0.24);
+}
+
+.study-breakdown.fail {
+  border-color: rgba(180, 83, 9, 0.24);
+}
+
+.study-breakdown-head {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: center;
+}
+
+.study-breakdown-summary {
+  margin: 10px 0 0;
+}
+
+.study-breakdown-hint {
+  margin: 10px 0 0;
+  color: var(--muted);
+}
