@@ -4,13 +4,16 @@ from __future__ import annotations
 import json
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
+from urllib.parse import urlparse
 
+from auth_manager import CodexAuthManager
 from evaluator import StudyCheckEvaluator
 from paper_builder import PaperBuilder
 
 
 EVALUATOR = StudyCheckEvaluator()
 PAPER_BUILDER = PaperBuilder(Path(__file__).resolve().parent.parent)
+AUTH_MANAGER = CodexAuthManager()
 
 
 class StudyCheckHandler(BaseHTTPRequestHandler):
@@ -29,13 +32,19 @@ class StudyCheckHandler(BaseHTTPRequestHandler):
         self._send(200, {"ok": True})
 
     def do_GET(self) -> None:  # noqa: N802
-        if self.path == "/api/health":
+        parsed = urlparse(self.path)
+        if parsed.path == "/api/health":
             self._send(200, {"ok": True, "provider": EVALUATOR.provider_name, "paperBuilder": True})
+            return
+        if parsed.path == "/api/auth/codex/status":
+            AUTH_MANAGER.clear_finished_session()
+            self._send(200, {"ok": True, **AUTH_MANAGER.status()})
             return
         self._send(404, {"ok": False, "error": "Not found"})
 
     def do_POST(self) -> None:  # noqa: N802
-        if self.path not in {"/api/study-check", "/api/paper/analyze", "/api/paper/apply"}:
+        parsed = urlparse(self.path)
+        if parsed.path not in {"/api/study-check", "/api/paper/analyze", "/api/paper/apply", "/api/auth/codex/start"}:
             self._send(404, {"ok": False, "error": "Not found"})
             return
 
@@ -48,10 +57,12 @@ class StudyCheckHandler(BaseHTTPRequestHandler):
             return
 
         try:
-            if self.path == "/api/study-check":
+            if parsed.path == "/api/study-check":
                 result = EVALUATOR.evaluate(payload)
-            elif self.path == "/api/paper/analyze":
+            elif parsed.path == "/api/paper/analyze":
                 result = PAPER_BUILDER.analyze(payload)
+            elif parsed.path == "/api/auth/codex/start":
+                result = {"ok": True, **AUTH_MANAGER.start_device_auth()}
             else:
                 result = PAPER_BUILDER.apply(payload)
         except Exception as exc:  # noqa: BLE001
