@@ -3,11 +3,14 @@ from __future__ import annotations
 
 import json
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
+from pathlib import Path
 
 from evaluator import StudyCheckEvaluator
+from paper_builder import PaperBuilder
 
 
 EVALUATOR = StudyCheckEvaluator()
+PAPER_BUILDER = PaperBuilder(Path(__file__).resolve().parent.parent)
 
 
 class StudyCheckHandler(BaseHTTPRequestHandler):
@@ -27,12 +30,12 @@ class StudyCheckHandler(BaseHTTPRequestHandler):
 
     def do_GET(self) -> None:  # noqa: N802
         if self.path == "/api/health":
-            self._send(200, {"ok": True, "provider": EVALUATOR.provider_name})
+            self._send(200, {"ok": True, "provider": EVALUATOR.provider_name, "paperBuilder": True})
             return
         self._send(404, {"ok": False, "error": "Not found"})
 
     def do_POST(self) -> None:  # noqa: N802
-        if self.path != "/api/study-check":
+        if self.path not in {"/api/study-check", "/api/paper/analyze", "/api/paper/apply"}:
             self._send(404, {"ok": False, "error": "Not found"})
             return
 
@@ -45,7 +48,12 @@ class StudyCheckHandler(BaseHTTPRequestHandler):
             return
 
         try:
-            result = EVALUATOR.evaluate(payload)
+            if self.path == "/api/study-check":
+                result = EVALUATOR.evaluate(payload)
+            elif self.path == "/api/paper/analyze":
+                result = PAPER_BUILDER.analyze(payload)
+            else:
+                result = PAPER_BUILDER.apply(payload)
         except Exception as exc:  # noqa: BLE001
             self._send(500, {"ok": False, "error": str(exc)})
             return

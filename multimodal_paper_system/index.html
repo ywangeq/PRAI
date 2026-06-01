@@ -453,6 +453,7 @@
       <div class="toolbar" id="filters"></div>
 
       <div class="graph-tools">
+        <button id="addPaper">添加 Paper</button>
         <button id="restartPhysics" class="active">重启物理</button>
         <button id="togglePhysics" class="active">暂停动态</button>
         <button id="fitView">适配视图</button>
@@ -564,6 +565,9 @@
         state.filter = "All";
         renderFilters();
         applyFilter();
+      };
+      document.getElementById("addPaper").onclick = () => {
+        window.open(absoluteHref(`add_paper.html?v=${noteVersion}`), "_blank", "noopener");
       };
     }
 
